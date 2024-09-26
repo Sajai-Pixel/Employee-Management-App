@@ -1,59 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; 
-import EmployeeForm from './EmployeeForm'; 
+import axios from 'axios';
+import EmployeeForm from './EmployeeForm';
 import EmployeeList from './EmployeeList';
+import Header from './Header'
 import './App.css'
-import Header from './Header';
 
 const App = () => {
-  const [employees, setEmployees] = useState([]); 
-  const [selectedEmployee, setSelectedEmployee] = useState(null); 
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/employees'); 
-      setEmployees(res.data); 
-    } catch (error) {
-      console.error("Error fetching employees", error); 
-    }
+    const res = await axios.get('https://employee-server-dpao.onrender.com/employees');
+    setEmployees(res.data);
   };
 
   const handleSave = async (employee) => {
-    try {
-      if (employee.id) {
-        await axios.put(`http://localhost:5000/employees/${employee.id}`, employee);
-      } else {
-        await axios.post('http://localhost:5000/employees', employee);
-      }
-      fetchEmployees();
-      setSelectedEmployee(null); 
-    } catch (error) {
-      console.error("Error saving employee", error); 
+    if (employee.id) {
+      await axios.put(`https://employee-server-dpao.onrender.com/employees/${employee.id}`, employee);
+    } else {
+      await axios.post('https://employee-server-dpao.onrender.com/employees', employee);
     }
+    fetchEmployees();
+    setSelectedEmployee(null);
   };
 
+  // Fix: Define handleEdit here
   const handleEdit = (employee) => {
-    setSelectedEmployee(employee); 
+    setSelectedEmployee(employee);
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/employees/${id}`); 
-      fetchEmployees(); 
-    } catch (error) {
-      console.error("Error deleting employee", error); 
-    }
+    await axios.delete(`https://employee-server-dpao.onrender.com/employees/${id}`);
+    fetchEmployees();
   };
 
   return (
     <div>
       <Header/>
       <EmployeeForm selectedEmployee={selectedEmployee} onSave={handleSave} />
-
       <EmployeeList employees={employees} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
